@@ -44,9 +44,29 @@ class obj():
 
 class PlayerController():
     gameObject = obj()
+    vel = [100,60]
 
     def move(self, x, y):
         gameObject.transform.pos = [self.transform.pos[0] + (x * Time.deltaTime), self.transform.pos[1] + (y * Time.deltaTime)]
+    def collisions(self):
+        if self.transform.pos[0] <= 0 :
+            if(self.transform.pos[0] < 0):
+                self.vel[0] = -self.vel[0]
+        
+        if self.transform.pos[0] + self.gameObject.body.radius * 2 >= 720:
+            if(self.vel[0] > 0):
+                self.vel[0] = -self.vel[1]
+
+        if self.transform.pos[1] <= 0:
+            if(self.vel[1] < 0):
+                self.vel[1] = -self.vel[1]
+        
+        if self.transform.pos[1] + self.gameObject.body.radius * 2 >= 720:
+            if(self.vel[1] > 0):
+                self.vel[1] = -self.vel[1]
+    def update(self):
+        self.move(self.vel[0], self.vel[1])
+        self.collisions()
 
 class nullController():
     transform = Transform()
@@ -55,7 +75,6 @@ class GameObject():
     body = Circle(5, [255, 0, 0])
     transform = Transform()
     controller = nullController()
-
     def __init__(self, body, controller):
         gameObjects.append(self)
         self.body = body
@@ -65,62 +84,9 @@ class GameObject():
 
     def update(self):
         self.body.draw(self.transform.pos)
+        self.controller.update()
 
 player = GameObject(Circle(20, [255, 0, 0]), PlayerController())
-
-class Ball():
-    transform = Transform()
-    centralPos = [0, 0]
-    transform.pos = [250, 250]
-    radius = 20
-
-    velocity = [0, 0]
-    speed = 40
-
-    player = GameObject(Circle(5, [255, 0, 0]), PlayerController())
-
-    def __init__(self, player):
-        gameObjects.append(self)
-        self.velocity = [-5, random.randint(-4, 4)]
-
-        if self.velocity[1] > 0 and self.velocity[1] < 1: self.velocity[1] = 2
-        if self.velocity[1] < 0 and self.velocity[1] > -1: self.velocity[1] = -2
-
-        self.player = player
-
-    def draw(self):
-        self.body = pygame.draw.circle(screen, (255, 0, 0), (self.transform.pos[0] + self.radius, self.transform.pos[1] - self.radius), self.radius, 5)
-    
-    def collisions(self):
-        if self.transform.pos[0] <= 0 :
-            if(self.transform.pos[0] < 0):
-                self.velocity[0] = -self.velocity[0]
-        
-        if self.transform.pos[0] >= 500 and self.transform.pos[0] <= 505:
-            if self.transform.pos[1] >= player.transform.pos[1] and self.transform.pos[1] <= player.transform.pos[1] + player.heigth:
-                if(self.velocity[0] > 0):
-                    self.velocity[0] = -self.velocity[0] - 1
-                    self.velocity[1] = -((player.transform.pos[1] + player.heigth / 2) - self.transform.pos[1]) / 5
-        elif self.transform.pos[0] >= 500: player.Dead()
-
-        if self.transform.pos[1] - self.radius <= 0:
-            if(self.velocity[1] < 0):
-                self.velocity[1] = -self.velocity[1]
-        
-        if self.transform.pos[1] >= 500:
-            if(self.velocity[1] > 0):
-                self.velocity[1] = -self.velocity[1]
-
-    def move(self):
-        self.collisions()
-        self.transform.pos = [self.transform.pos[0] + (self.velocity[0] * self.speed * Time.deltaTime), self.transform.pos[1] + (self.velocity[1] * self.speed * Time.deltaTime)]
-    
-    def update(self):
-        self.centralPos = (self.transform.pos[0] + self.radius, self.transform.pos[1] - self.radius)
-        self.move()
-        self.draw()
-
-ball = Ball(player)
 
 while running:
     pygame.display.flip()
