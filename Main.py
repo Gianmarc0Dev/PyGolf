@@ -44,7 +44,7 @@ class obj():
 
 class PlayerController():
     gameObject = obj()
-    vel = [100,60]
+    vel = [200,150]
 
     def move(self, x, y):
         gameObject.transform.pos = [self.transform.pos[0] + (x * Time.deltaTime), self.transform.pos[1] + (y * Time.deltaTime)]
